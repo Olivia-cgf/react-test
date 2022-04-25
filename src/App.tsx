@@ -77,7 +77,7 @@ function App() {
   return (
     <div className="App">
       <h3>QQ查询</h3>
-      <button onClick={add}>点击+1</button>
+      {/* <button onClick={add}>点击+1</button> */}
       <input onChange={changeFn} placeholder="请输入qq号" />
       {!status ? (
         <div className="list">
