@@ -4,7 +4,6 @@ import _debounce from "lodash/debounce";
 import { getMock } from "./util/interface";
 import loadingSvg from "./image/loading.svg";
 import { STATUS, QQ_REG } from "./constant";
-import axios from "axios";
 
 // 加载
 const Spin = (status: string, msg: string) => {
@@ -27,6 +26,7 @@ const Spin = (status: string, msg: string) => {
 
 // 用户搜索卡片
 const CardItem = memo(({ userInfo }: any) => {
+  console.log("memo");
   return (
     <div className="card">
       <div className="card-left">
@@ -40,18 +40,17 @@ const CardItem = memo(({ userInfo }: any) => {
   );
 });
 
+
 function App() {
   const [userInfo, setUserInfo] = useState({});
   const [status, setStatus] = useState("empty");
   const [msg, setMsg] = useState("");
+  let [num, setNum]= useState(1);
 
-  let source: any;
-  const cancelRequest = () => {
-    if (typeof source === "function") {
-      source("终止请求");
-    }
-  };
-  const changeFn = _debounce(async (e: any) => {
+  const add=()=>{
+    setNum(num++);
+  }
+  const changeFn = async (e: any) => {
     const value = e.target.value;
 
     if (!QQ_REG.test(value) || value.length > 11) {
@@ -59,34 +58,26 @@ function App() {
       setMsg("请输入正确的qq号");
       return;
     }
-
     setStatus("loading");
-    let CancelToken = axios.CancelToken;
-    source = CancelToken.source();
-
-    // 取消上一次请求
-    cancelRequest();
-    axios
-      .post(`/api/qq.info?qq=${value}`, {
-        cancelToken: new axios.CancelToken(function executor(c) {
-          source = c;
-        }),
-      })
+    window.source();
+    getMock({ qq: value })
       .then((res) => {
-        console.log(res);
-      })
-      .catch((err) => {
-        if (axios.isCancel(err)) {
-          console.log("Rquest canceled", err.message); //请求如果被取消，这里是返回取消的message
+        if (res.code === 1) {
+          setUserInfo(res);
+          setStatus(!res?.qq ? "empty" : "");
         } else {
-          //handle error
-          console.log(err);
+          setStatus("error");
+          setMsg(res?.msg);
         }
+      })
+      .catch(() => {
+        setStatus("error");
       });
-  }, 500);
+  };
   return (
     <div className="App">
       <h3>QQ查询</h3>
+      <button onClick={add}>点击+1</button>
       <input onChange={changeFn} placeholder="请输入qq号" />
       {!status ? (
         <div className="list">

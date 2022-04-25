@@ -1,12 +1,21 @@
 import axios from 'axios';
  
-export function post(url:string, data = {},) {
+declare global {
+    interface Window { source: any; }
+}
+ 
+window.source= window.source|| {};
+export function post(url:string, data = {}) {
 	let postData = data;
+
  	return new Promise((resolve, reject) => {
 		axios({
 			method: 'post',
 			url: url,
 			data: postData,
+			cancelToken: new axios.CancelToken(function executor(c) {
+				window.source = c;
+		   })
 		}).then(response => {
 			resolve(response.data);
 		})
@@ -33,7 +42,7 @@ export function post(url:string, data = {},) {
 axios.interceptors.response.use((response) => {
 	return response;
 }, function(error) {
-	if(error.response.status === 401) {
+	if(error.response?.status === 401) {
 		// router.push({
 		// 	path: "/login",
 		// });
