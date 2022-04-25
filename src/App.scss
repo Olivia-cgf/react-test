@@ -1,0 +1,57 @@
+.App {
+  text-align: center;
+  .center{
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%,-50%);
+    color: #999;
+  }
+  .text-one {
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+  }
+
+  h3 {
+  }
+  input{
+    width: 200px;
+    height: 28px;
+    line-height: 28px;
+    padding: 0 4px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+  .list{
+    padding: 12px;
+  }
+  .card {
+    display: flex;
+    padding: 12px;
+    padding: 12px;
+    border: 1px solid rgba(0,0,0,.06);
+    .card-left {
+      width: 60px;
+      margin-right: 12px;
+      img {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        border: 1px solid #ddd;
+      }
+    }
+    .card-right {
+      width: 100%;
+      .name {
+        font-size: 16px;    
+        text-align: left;
+        padding: 8px 0;
+      }
+      .mobile {
+        color: #ccc;
+        text-align: left;
+      }
+    }
+  }
+}
