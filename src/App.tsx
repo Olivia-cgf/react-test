@@ -4,6 +4,7 @@ import _debounce from "lodash/debounce";
 import { getMock } from "./util/interface";
 import loadingSvg from "./image/loading.svg";
 import { STATUS, QQ_REG } from "./constant";
+import axios from "axios";
 
 // 加载
 const Spin = (status: string, msg: string) => {
@@ -44,7 +45,12 @@ function App() {
   const [status, setStatus] = useState("empty");
   const [msg, setMsg] = useState("");
 
-  let cancel = (value: unknown) => {};
+  let source: any;
+  const cancelRequest = () => {
+    if (typeof source === "function") {
+      source("终止请求");
+    }
+  };
   const changeFn = _debounce(async (e: any) => {
     const value = e.target.value;
 
@@ -54,21 +60,28 @@ function App() {
       return;
     }
 
-    cancel("");
-    const abortRequest = new Promise((resolve) => (cancel = resolve));
     setStatus("loading");
-    Promise.race([abortRequest, getMock({ qq: value })])
-      .then((res) => {
-        if (res.code === 1) {
-          setUserInfo(res);
-          setStatus(!res?.qq ? "empty" : "");
-        } else {
-          setStatus("error");
-          setMsg(res?.msg);
-        }
+    let CancelToken = axios.CancelToken;
+    source = CancelToken.source();
+
+    // 取消上一次请求
+    cancelRequest();
+    axios
+      .post(`/api/qq.info?qq=${value}`, {
+        cancelToken: new axios.CancelToken(function executor(c) {
+          source = c;
+        }),
       })
-      .catch(() => {
-        setStatus("error");
+      .then((res) => {
+        console.log(res);
+      })
+      .catch((err) => {
+        if (axios.isCancel(err)) {
+          console.log("Rquest canceled", err.message); //请求如果被取消，这里是返回取消的message
+        } else {
+          //handle error
+          console.log(err);
+        }
       });
   }, 500);
   return (
