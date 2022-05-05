@@ -24,8 +24,13 @@ const Spin = (status: string, msg: string) => {
   return <div className="center">{tip}</div>;
 };
 
+interface IUserInfo{
+  qlogo?: string;
+  name?: string;
+  qq?: Number;
+}
 // 用户搜索卡片
-const CardItem = memo(({ userInfo }: any) => {
+const CardItem = memo(({ userInfo }: IUserInfo | any) => {
   console.log("memo");
   return (
     <div className="card">
